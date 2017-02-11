@@ -72,7 +72,8 @@ module Jekyll
       self.data = {}
       # generate
       unless @site.config['graph-json']['neo4j'].nil?
-        session = Neo4j::Session.open(:server_db, @site.config['graph-json']['neo4j']['host'], basic_auth: { username: @site.config['graph-json']['neo4j']['username'], password: @site.config['graph-json']['neo4j']['password']})
+        ssl = @site.config['graph-json']['neo4j']['host'] =~ /^https/ ? { ssl: { verify: true }} : { ssl: { verify: false }}
+        session = Neo4j::Session.open(:server_db, @site.config['graph-json']['neo4j']['host'], basic_auth: { username: @site.config['graph-json']['neo4j']['username'], password: @site.config['graph-json']['neo4j']['password']}, initialize: ssl)
         session.query('MATCH (n) DETACH DELETE n')
         save_node = Array.new()
         Neo4j::Transaction.run do
